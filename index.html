@@ -123,6 +123,53 @@ body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;backgr
 .break-box .emoji{font-size:50px;margin-bottom:10px}
 .break-box h3{color:var(--green);font-size:20px;margin-bottom:8px}
 .break-box p{color:var(--text-l);font-size:14px;margin-bottom:16px}
+/* ============ 农场模块样式 ============ */
+.farm-tabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.farm-tab{padding:8px 14px;border-radius:10px;background:#fff;border:2px solid #e0d4e0;font-size:14px;cursor:pointer;transition:all .2s;font-family:inherit}
+.farm-tab.active{background:var(--green);color:#fff;border-color:var(--green);font-weight:600}
+.farm-tab:active{transform:scale(.95)}
+.farm-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.plot{aspect-ratio:1;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;background:linear-gradient(135deg,#d4a373,#c9a06b);border:3px solid #b8860b}
+.plot:active{transform:scale(.95)}
+.plot:hover{box-shadow:0 4px 12px rgba(0,0,0,.15)}
+.plot .soil{position:absolute;bottom:0;left:0;right:0;height:30%;background:linear-gradient(180deg,#8b7355,#6b4f2f)}
+.plot .crop-emoji{font-size:36px;z-index:1;animation:cropGrow .5s ease}
+.plot .stage-tag{font-size:10px;color:#fff;background:rgba(0,0,0,.4);padding:2px 6px;border-radius:6px;margin-top:2px;z-index:1}
+.plot .health-bar{position:absolute;top:4px;left:4px;right:4px;height:4px;background:rgba(255,255,255,.3);border-radius:2px;z-index:2}
+.plot .health-bar .fl{height:100%;border-radius:2px;background:#66bb6a;transition:width .3s}
+.plot.wilted{filter:grayscale(1);opacity:.5}
+.plot.wilted .crop-emoji{animation:wilt .5s ease forwards}
+.plot.locked{background:linear-gradient(135deg,#e0e0e0,#bdbdbd);border-color:#9e9e9e;cursor:not-allowed}
+.plot .bear-emoji{position:absolute;font-size:28px;z-index:3;animation:bearAttack 1.5s ease infinite}
+@keyframes cropGrow{from{transform:scale(0) translateY(10px)}to{transform:scale(1) translateY(0)}}
+@keyframes wilt{0%{transform:scale(1)}100%{transform:scale(.8) rotate(-15deg);opacity:.3}}
+@keyframes bearAttack{0%{transform:translateX(120%) rotate(0deg)}30%{transform:translateX(0) rotate(5deg)}60%{transform:translateX(0) rotate(-5deg)}100%{transform:translateX(-120%) rotate(0deg)}}
+.farm-stats{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.farm-stat{background:#fff;border-radius:12px;padding:8px 14px;display:flex;align-items:center;gap:6px;font-size:14px;box-shadow:0 2px 6px rgba(0,0,0,.06)}
+.farm-stat .n{font-size:20px;font-weight:700}
+.farm-stat.sun .n{color:#ffa726}
+.farm-stat.coin .n{color:#ffc107}
+.farm-stat.seed .n{color:var(--green)}
+.farm-shop-item{background:#fff;border-radius:14px;padding:14px;margin-bottom:10px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 6px rgba(0,0,0,.05)}
+.farm-shop-item .ic{font-size:32px;flex-shrink:0}
+.farm-shop-item .info{flex:1}
+.farm-shop-item .info h4{font-size:16px;color:var(--text);margin-bottom:2px}
+.farm-shop-item .info p{font-size:13px;color:var(--text-l)}
+.farm-shop-item .buy-btn{padding:8px 16px;border:none;border-radius:10px;background:var(--green);color:#fff;font-size:14px;cursor:pointer;font-family:inherit;flex-shrink:0}
+.farm-shop-item .buy-btn:active{transform:scale(.95)}
+.farm-shop-item .buy-btn:disabled{background:#ccc;cursor:not-allowed}
+.farm-alert{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:996;display:flex;align-items:center;justify-content:center;padding:20px}
+.farm-alert-box{background:#fff;border-radius:20px;padding:24px;max-width:360px;text-align:center}
+.farm-alert-box .big-emoji{font-size:48px;margin-bottom:10px}
+.farm-alert-box h3{color:var(--pri-d);font-size:18px;margin-bottom:10px}
+.farm-alert-box p{color:var(--text-l);font-size:14px;line-height:1.6;margin-bottom:16px}
+.farm-alert-box .btns{display:flex;gap:8px;justify-content:center}
+.farm-empty{text-align:center;color:var(--text-l);padding:30px;font-size:15px}
+@media(max-width:768px){
+.farm-grid{grid-template-columns:repeat(2,1fr)}
+.plot .crop-emoji{font-size:28px}
+.farm-shop-item{flex-wrap:wrap}
+}
 </style>
 </head>
 <body>
@@ -137,9 +184,10 @@ body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;backgr
 <div class="nav-item" data-p="english" onclick="sw('english')"><span class="icon">🅰️</span>英语阅读</div>
 <div class="nav-item" data-p="chores" onclick="sw('chores')"><span class="icon">🧹</span>家务劳动</div>
 <div class="nav-item" data-p="pet" onclick="sw('pet')"><span class="icon">🐰</span>小宠物中心</div>
+<div class="nav-item" data-p="farm" onclick="sw('farm')"><span class="icon">🌻</span>我的农场</div>
 <div class="nav-item" data-p="calendar" onclick="sw('calendar')"><span class="icon">📅</span>日历打卡</div>
 <div class="nav-item" data-p="guide" onclick="sw('guide')"><span class="icon">📋</span>学习指南</div>
-<div class="nav-stat">⭐积分<b id="nP">0</b><br>🌾饲料<b class="feed" id="nF">0</b><br><span id="timerDisp" style="font-size:11px;color:var(--purple)"></span></div>
+<div class="nav-stat">⭐积分<b id="nP">0</b><br>🌾饲料<b class="feed" id="nF">0</b><br>🌞阳光<b style="color:#ffa726" id="nSun">0</b> 🪙金币<b style="color:#ffc107" id="nCoin">0</b><br><span id="timerDisp" style="font-size:11px;color:var(--purple)"></span></div>
 </div>
 <div class="main" id="main"></div>
 </div>
@@ -175,6 +223,8 @@ function addPoints(n,feed){
 function updateNav(){
   document.getElementById('nP').textContent=D.get('points',0);
   document.getElementById('nF').textContent=D.get('feed',0);
+  var elSun=document.getElementById('nSun');if(elSun)elSun.textContent=D.get('farm_sun',0);
+  var elCoin=document.getElementById('nCoin');if(elCoin)elCoin.textContent=D.get('farm_coins',0);
 }
 
 // ============ 每日种子 ============
@@ -223,6 +273,20 @@ function toggleCheck(name){
     if(tx)tx.classList.add('done');
     addPoints(10,2);
     if(name!=='pet'&&name!=='calendar')updateCalMarks();
+    // ============ 农场联动：作业打卡奖励 ============
+    if(name==='reading'||name==='words'){
+      farmOnCheck('chinese'); // 语文打卡奖励
+    }else if(name==='math'){
+      farmOnCheck('math'); // 数学打卡奖励
+    }else if(name==='english'){
+      farmOnCheck('english'); // 英语打卡奖励
+      // 补偿机制：如果之前有遗漏（farm_bears存在），补做后给杀虫剂
+      if(D.get('farm_bears',[]).length>0)farmOnMakeup('english');
+    }
+    // 语文用words补做也触发补偿
+    if(name==='words'&&D.get('farm_bears',[]).length>0)farmOnMakeup('chinese');
+    if(name==='reading'&&D.get('farm_bears',[]).length>0)farmOnMakeup('chinese');
+    if(name==='math'&&D.get('farm_bears',[]).length>0)farmOnMakeup('math');
   }else{
     if(el)el.classList.remove('done');
     if(tx)tx.classList.remove('done');
@@ -453,6 +517,507 @@ function petAction(act){
   var f=D.get('pet_full',50)-2;if(f<0)f=0;D.set('pet_full',f);
   setTimeout(function(){renderPanel('pet');},100);
 }
+// ============ 农场模块 ============
+// 学科种子配置：对应作物emoji、名称、收获金币、生长阶段emoji
+var FARM_CROPS={
+  chinese:{name:'语文种子',crop:'🌷',cropName:'郁金香',coins:15,stages:['🌱','🌿','🌸','🌷']},
+  math:{name:'数学种子',crop:'🥕',cropName:'胡萝卜',coins:20,stages:['🌱','🌿','🌿','🥕']},
+  english:{name:'英语种子',crop:'🌻',cropName:'向日葵',coins:18,stages:['🌱','🌿','🌼','🌻']}
+};
+var FARM_PLOT_COUNT=6; // 地块数量（可调整）
+// 惩罚参数（可调整）
+var FARM_PENALTY={miss1:{bears:1,healthDmg:1,stealPct:0.5,wiltMature:0},miss2:{bears:2,healthDmg:2,stealPct:0.5,wiltMature:1},miss3:{bears:3,healthDmg:3,stealPct:0.5,wiltMature:99}};
+
+// 初始化农场数据
+function farmInit(){
+  if(!D.get('farm_plots',null)){
+    var plots=[];
+    for(var i=0;i<FARM_PLOT_COUNT;i++){plots.push({seed:null,stage:0,health:4,isWilted:false,hasBear:false});}
+    D.set('farm_plots',plots);
+  }
+  if(!D.get('farm_seeds',null))D.set('farm_seeds',{chinese:0,math:0,english:0});
+  if(!D.get('farm_items',null))D.set('farm_items',{pesticide:0,shield:0});
+  if(!D.get('farm_sun',null))D.set('farm_sun',0);
+  if(!D.get('farm_coins',null))D.set('farm_coins',0);
+  if(!D.get('farm_shield_active',null))D.set('farm_shield_active',false);
+  if(!D.get('farm_streak',null))D.set('farm_streak',0);
+  if(!D.get('farm_unlocked_skins',null))D.set('farm_unlocked_skins',[]);
+}
+
+// 获取昨日日期字符串
+function getYesterday(){
+  var d=new Date();d.setDate(d.getDate()-1);
+  return d.toISOString().slice(0,10);
+}
+
+// 【核心联动】农场夜间结算——惩罚机制
+function farmSettle(){
+  farmInit();
+  var lastSettle=D.get('farm_last_settle','');
+  var yesterday=getYesterday();
+  // 如果已经结算过昨天，跳过
+  if(lastSettle===today||lastSettle===yesterday)return null;
+
+  // 检查昨天的作业打卡情况
+  var yCheck=D.get('check_'+yesterday,{});
+  // 语文=reading+words, 数学=math, 英语=english
+  var chineseDone=yCheck.reading||yCheck.words;
+  var mathDone=yCheck.math;
+  var englishDone=yCheck.english;
+  var missed=0;
+  if(!chineseDone)missed++;
+  if(!mathDone)missed++;
+  if(!englishDone)missed++;
+
+  if(missed===0){
+    // 全部完成，无惩罚，连续打卡+1
+    var streak=D.get('farm_streak',0)+1;
+    D.set('farm_streak',streak);
+    D.set('farm_last_settle',yesterday);
+    return {missed:0,bears:0,msg:'昨天三科作业全部完成！农场平安无事，连续打卡'+streak+'天 🎉'};
+  }
+
+  // 重置连续打卡
+  D.set('farm_streak',0);
+  var penalty=FARM_PENALTY['miss'+missed];
+  var plots=D.get('farm_plots',[]);
+  var bears=[];
+
+  // 护盾抵消一次攻击
+  if(D.get('farm_shield_active',false)){
+    D.set('farm_shield_active',false);
+    D.set('farm_last_settle',yesterday);
+    return {missed:missed,bears:0,msg:'昨晚'+missed+'只小狗熊来犯，但护盾抵挡了攻击！🛡️ 农场安全！'};
+  }
+
+  // 执行小狗熊攻击
+  for(var i=0;i<penalty.bears;i++){
+    // 随机选一块有作物的地块攻击
+    var validPlots=[];
+    for(var j=0;j<plots.length;j++){
+      if(plots[j].seed&&!plots[j].isWilted)validPlots.push(j);
+    }
+    if(validPlots.length>0){
+      var pIdx=validPlots[Math.floor(Math.random()*validPlots.length)];
+      plots[pIdx].health-=penalty.healthDmg;
+      if(plots[pIdx].health<0)plots[pIdx].health=0;
+      // 成熟作物枯萎逻辑
+      if(penalty.wiltMature>0&&plots[pIdx].stage>=3){
+        plots[pIdx].isWilted=true;
+        if(penalty.wiltMature<99)penalty.wiltMature--; // 只枯萎指定数量
+      }else if(penalty.wiltMature>=99){
+        plots[pIdx].isWilted=true;
+      }
+      plots[pIdx].hasBear=true;
+      bears.push({plotIdx:pIdx});
+    }
+  }
+  D.set('farm_plots',plots);
+
+  // 偷取金币
+  var coins=D.get('farm_coins',0);
+  var stolen=Math.floor(coins*penalty.stealPct);
+  D.set('farm_coins',coins-stolen);
+
+  D.set('farm_last_settle',yesterday);
+  D.set('farm_bears',bears);
+
+  var msgs=['昨晚'+missed+'只小狗熊入侵了农场！','作物健康度-'+penalty.healthDmg,'被偷走'+stolen+'金币🪙'];
+  if(penalty.wiltMature>0)msgs.push('有作物被啃食枯萎了💔');
+  return {missed:missed,bears:bears,msg:msgs.join('，')};
+}
+
+// 【核心联动】作业打卡奖励——在toggleCheck中调用
+function farmOnCheck(subject){
+  farmInit();
+  // subject: chinese/math/english
+  var seedMap={chinese:'chinese',math:'math',english:'english'};
+  var seedKey=seedMap[subject];
+  if(!seedKey)return;
+
+  // 单科奖励：+1阳光, +1对应种子
+  D.set('farm_sun',D.get('farm_sun',0)+1);
+  var seeds=D.get('farm_seeds',{chinese:0,math:0,english:0});
+  seeds[seedKey]=(seeds[seedKey]||0)+1;
+  D.set('farm_seeds',seeds);
+
+  // 检查三科是否全部完成
+  var ck=D.get('check_'+today,{});
+  var cDone=ck.reading||ck.words;
+  var mDone=ck.math;
+  var eDone=ck.english;
+  if(cDone&&mDone&&eDone){
+    // 三科全完成额外奖励：+2阳光(共3), +3随机种子
+    D.set('farm_sun',D.get('farm_sun',0)+2);
+    var keys=['chinese','math','english'];
+    for(var i=0;i<3;i++){
+      var rk=keys[Math.floor(Math.random()*3)];
+      seeds[rk]=(seeds[rk]||0)+1;
+    }
+    D.set('farm_seeds',seeds);
+    // 宠物额外成长
+    var h=D.get('pet_happy',50)+5;if(h>100)h=100;D.set('pet_happy',h);
+    toast('🌻 三科全完成！+3阳光，+3随机种子，宠物+5开心！');
+  }else{
+    toast('🌻 +1阳光，+1'+FARM_CROPS[seedKey].name+'！');
+  }
+  updateNav();
+}
+
+// 【补偿机制】补做遗漏作业后获得杀虫剂
+function farmOnMakeup(subject){
+  farmInit();
+  var items=D.get('farm_items',{pesticide:0,shield:0});
+  items.pesticide+=1;
+  D.set('farm_items',items);
+  toast('🔧 补做完成！获得1个杀虫剂，可以去农场清除小狗熊！');
+}
+
+// 作物生长推进
+function farmGrowAll(){
+  farmInit();
+  var plots=D.get('farm_plots',[]);
+  for(var i=0;i<plots.length;i++){
+    if(plots[i].seed&&!plots[i].isWilted&&plots[i].stage<3){
+      plots[i].stage++;
+    }
+  }
+  D.set('farm_plots',plots);
+}
+
+// 农场每日初始化
+function farmDailyInit(){
+  farmInit();
+  var lastDay=D.get('farm_last_day','');
+  if(lastDay!==today){
+    // 新一天：先结算昨晚的惩罚
+    var result=farmSettle();
+    // 推进作物生长
+    farmGrowAll();
+    D.set('farm_last_day',today);
+    // 存储结算结果供进入农场时显示
+    if(result)D.set('farm_settle_result',result);
+  }
+}
+
+// 进入农场时检查弹窗
+function farmCheckAlert(){
+  farmInit();
+  // 先检查结算结果
+  var result=D.get('farm_settle_result',null);
+  if(result){
+    D.set('farm_settle_result',null); // 只显示一次
+    farmShowAlert(result.missed===0?'🌙':'🐻',result.missed===0?'农场平安！':'小狗熊来袭！',result.msg);
+    return;
+  }
+  // 检查今日未完成科目
+  var ck=D.get('check_'+today,{});
+  var cDone=ck.reading||ck.words;
+  var mDone=ck.math;
+  var eDone=ck.english;
+  var missed=[];
+  if(!cDone)missed.push('语文');
+  if(!mDone)missed.push('数学');
+  if(!eDone)missed.push('英语');
+  if(missed.length>0){
+    var hour=new Date().getHours();
+    var prefix=hour>=18?'今晚':'今天';
+    farmShowAlert('⚠️','还有作业未完成！','还有'+missed.length+'科作业未完成（'+missed.join('、')+'），'+prefix+'小狗熊会来破坏你的菜园！快去打卡完成任务');
+  }
+}
+
+// 农场弹窗
+function farmShowAlert(emoji,title,msg){
+  var ov=document.createElement('div');
+  ov.className='farm-alert';
+  ov.innerHTML='<div class="farm-alert-box"><div class="big-emoji">'+emoji+'</div><h3>'+title+'</h3><p>'+msg+'</p><div class="btns"><button class="btn btn-green" onclick="this.parentElement.parentElement.parentElement.remove()">我知道了</button></div></div>';
+  document.body.appendChild(ov);
+}
+
+// 农场面板渲染
+var farmTab='plots';
+function renderFarm(){
+  farmInit();
+  farmDailyInit();
+  // 首次进入检查弹窗（延迟显示）
+  if(!D.get('farm_alerted_'+today,false)){
+    D.set('farm_alerted_'+today,true);
+    setTimeout(farmCheckAlert,500);
+  }
+
+  var h='<div class="ph"><div class="pt">🌻 我的农场<span class="sub">学习种菜两不误</span></div></div>';
+
+  // 状态栏
+  var sun=D.get('farm_sun',0),coins=D.get('farm_coins',0);
+  var seeds=D.get('farm_seeds',{chinese:0,math:0,english:0});
+  var items=D.get('farm_items',{pesticide:0,shield:0});
+  h+='<div class="farm-stats">'+
+    '<div class="farm-stat sun">🌞 <span class="n">'+sun+'</span>阳光</div>'+
+    '<div class="farm-stat coin">🪙 <span class="n">'+coins+'</span>金币</div>'+
+    '<div class="farm-stat seed">🌷 <span class="n">'+(seeds.chinese||0)+'</span>语文种</div>'+
+    '<div class="farm-stat seed">🥕 <span class="n">'+(seeds.math||0)+'</span>数学种</div>'+
+    '<div class="farm-stat seed">🌻 <span class="n">'+(seeds.english||0)+'</span>英语种</div>'+
+    '</div>';
+
+  // 标签栏
+  h+='<div class="farm-tabs">'+
+    '<div class="farm-tab'+(farmTab==='plots'?' active':'')+'" onclick="farmTab=\'plots\';renderPanel(\'farm\')">🌱 种植地块</div>'+
+    '<div class="farm-tab'+(farmTab==='bag'?' active':'')+'" onclick="farmTab=\'bag\';renderPanel(\'farm\')">🎒 背包仓库</div>'+
+    '<div class="farm-tab'+(farmTab==='shop'?' active':'')+'" onclick="farmTab=\'shop\';renderPanel(\'farm\')">🏪 道具商店</div>'+
+    '<div class="farm-tab'+(farmTab==='mall'?' active':'')+'" onclick="farmTab=\'mall\';renderPanel(\'farm\')">🛒 金币商城</div>'+
+    '</div>';
+
+  if(farmTab==='plots')h+=renderFarmPlots();
+  else if(farmTab==='bag')h+=renderFarmBag();
+  else if(farmTab==='shop')h+=renderFarmShop();
+  else if(farmTab==='mall')h+=renderFarmMall();
+
+  return h;
+}
+
+// 渲染种植地块
+function renderFarmPlots(){
+  var plots=D.get('farm_plots',[]);
+  var seeds=D.get('farm_seeds',{chinese:0,math:0,english:0});
+  var items=D.get('farm_items',{pesticide:0,shield:0});
+  var h='<div class="farm-grid">';
+  for(var i=0;i<plots.length;i++){
+    var p=plots[i];
+    var cls='plot';
+    var inner='<div class="soil"></div>';
+    if(p.seed){
+      var crop=FARM_CROPS[p.seed];
+      cls+=' crop';
+      if(p.isWilted)cls+=' wilted';
+      inner+='<div class="crop-emoji">'+crop.stages[p.stage]+'</div>';
+      var stageNames=['发芽','生长','开花','成熟'];
+      inner+='<div class="stage-tag">'+stageNames[p.stage]+'</div>';
+      if(p.stage<3)inner+='<div class="health-bar"><div class="fl" style="width:'+(p.health/4*100)+'%"></div></div>';
+      if(p.hasBear)inner+='<div class="bear-emoji">🐻</div>';
+    }else{
+      inner+='<div class="crop-emoji" style="opacity:.3">➕</div>';
+      inner+='<div class="stage-tag">空地</div>';
+    }
+    h+='<div class="'+cls+'" onclick="farmPlotClick('+i+')">'+inner+'</div>';
+  }
+  h+='</div>';
+
+  // 道具快捷使用
+  h+='<div class="card"><h3>🔧 道具</h3>';
+  h+='<div style="display:flex;gap:8px;flex-wrap:wrap">';
+  h+='<button class="btn btn-sm '+(items.pesticide>0?'btn-green':'')+'" '+(items.pesticide>0?'':'disabled')+' onclick="farmUsePesticide()">🔫 杀虫剂 x'+(items.pesticide||0)+'</button>';
+  var shieldOn=D.get('farm_shield_active',false);
+  h+='<button class="btn btn-sm '+(items.shield>0&&!shieldOn?'':'')+'" '+(items.shield>0&&!shieldOn?'':'disabled')+' onclick="farmUseShield()">🛡️ 护盾 x'+(items.shield||0)+(shieldOn?'(已激活)':'')+'</button>';
+  h+='</div></div>';
+
+  // 种子库存
+  h+='<div class="card"><h3>🌱 种子库存</h3><div style="display:flex;gap:12px;flex-wrap:wrap;font-size:15px">';
+  h+='<span>🌷 语文种子 x'+(seeds.chinese||0)+'</span>';
+  h+='<span>🥕 数学种子 x'+(seeds.math||0)+'</span>';
+  h+='<span>🌻 英语种子 x'+(seeds.english||0)+'</span>';
+  h+='</div><p style="color:var(--text-l);font-size:13px;margin-top:6px">完成对应学科打卡可获得种子，点击空地播种</p></div>';
+
+  return h;
+}
+
+// 地块点击：播种或收获
+function farmPlotClick(idx){
+  farmInit();
+  var plots=D.get('farm_plots',[]);
+  var p=plots[idx];
+  if(!p)return;
+
+  if(p.isWilted){
+    toast('💔 作物已枯萎，需要杀虫剂修复');
+    return;
+  }
+
+  if(!p.seed){
+    // 空地：播种
+    var seeds=D.get('farm_seeds',{chinese:0,math:0,english:0});
+    // 找有库存的种子
+    var available=[];
+    if(seeds.chinese>0)available.push('chinese');
+    if(seeds.math>0)available.push('math');
+    if(seeds.english>0)available.push('english');
+    if(available.length===0){
+      toast('没有种子！完成作业打卡获取种子');
+      return;
+    }
+    // 如果只有一种，直接播种；多种则选第一种（简化操作）
+    var seedKey=available[0];
+    if(available.length>1){
+      // 弹出选择
+      var opts='';
+      available.forEach(function(k){opts+='<button class="btn btn-sm" style="margin:4px" onclick="farmPlant('+idx+',\''+k+'\')">'+FARM_CROPS[k].crop+' '+FARM_CROPS[k].name+' x'+seeds[k]+'</button>';});
+      farmShowAlert('🌱','选择种子播种',opts);
+      return;
+    }
+    farmPlant(idx,seedKey);
+    return;
+  }
+
+  // 有作物
+  if(p.stage>=3){
+    // 成熟：收获
+    var crop=FARM_CROPS[p.seed];
+    var coins=crop.coins;
+    D.set('farm_coins',D.get('farm_coins',0)+coins);
+    p.seed=null;p.stage=0;p.health=4;p.isWilted=false;p.hasBear=false;
+    D.set('farm_plots',plots);
+    toast('🌾 收获'+crop.cropName+'！+'+coins+'金币🪙');
+    updateNav();
+    renderPanel('farm');
+    return;
+  }
+
+  // 未成熟
+  if(p.hasBear){
+    toast('🐻 小狗熊在啃食！用杀虫剂驱赶');
+    return;
+  }
+  toast('🌱 正在生长中...阶段'+p.stage+'/3');
+}
+
+// 播种
+function farmPlant(idx,seedKey){
+  farmInit();
+  var seeds=D.get('farm_seeds',{chinese:0,math:0,english:0});
+  if(seeds[seedKey]<=0){toast('种子不够！');return;}
+  seeds[seedKey]--;
+  D.set('farm_seeds',seeds);
+  var plots=D.get('farm_plots',[]);
+  plots[idx].seed=seedKey;
+  plots[idx].stage=0;
+  plots[idx].health=4;
+  plots[idx].isWilted=false;
+  plots[idx].hasBear=false;
+  D.set('farm_plots',plots);
+  toast('🌱 播种成功！'+FARM_CROPS[seedKey].crop+' '+FARM_CROPS[seedKey].cropName);
+  // 关闭弹窗
+  var alert=document.querySelector('.farm-alert');
+  if(alert)alert.remove();
+  renderPanel('farm');
+}
+
+// 使用杀虫剂
+function farmUsePesticide(){
+  farmInit();
+  var items=D.get('farm_items',{pesticide:0,shield:0});
+  if(items.pesticide<=0){toast('没有杀虫剂！补做遗漏作业可获得');return;}
+  var plots=D.get('farm_plots',[]);
+  var cleared=false;
+  for(var i=0;i<plots.length;i++){
+    if(plots[i].hasBear){
+      plots[i].hasBear=false;
+      plots[i].health=Math.min(4,plots[i].health+2);
+      cleared=true;
+    }
+    if(plots[i].isWilted){
+      plots[i].isWilted=false;
+      plots[i].health=2;
+      cleared=true;
+    }
+  }
+  if(!cleared){toast('农场没有小狗熊，无需使用');return;}
+  items.pesticide--;
+  D.set('farm_items',items);
+  D.set('farm_plots',plots);
+  toast('🔫 杀虫剂使用成功！小狗熊被驱赶，作物恢复健康');
+  renderPanel('farm');
+}
+
+// 使用护盾
+function farmUseShield(){
+  farmInit();
+  var items=D.get('farm_items',{pesticide:0,shield:0});
+  if(items.shield<=0){toast('没有护盾！连续打卡3天+5阳光可兑换');return;}
+  if(D.get('farm_shield_active',false)){toast('护盾已激活中');return;}
+  items.shield--;
+  D.set('farm_items',items);
+  D.set('farm_shield_active',true);
+  toast('🛡️ 护盾已激活！可抵挡一次小狗熊攻击');
+  renderPanel('farm');
+}
+
+// 背包仓库
+function renderFarmBag(){
+  var seeds=D.get('farm_seeds',{chinese:0,math:0,english:0});
+  var items=D.get('farm_items',{pesticide:0,shield:0});
+  var skins=D.get('farm_unlocked_skins',[]);
+  var h='<div class="card"><h3>🌱 种子库存</h3>';
+  h+='<div class="farm-shop-item"><div class="ic">🌷</div><div class="info"><h4>语文种子 x'+(seeds.chinese||0)+'</h4><p>完成语文打卡获得，种出郁金香</p></div></div>';
+  h+='<div class="farm-shop-item"><div class="ic">🥕</div><div class="info"><h4>数学种子 x'+(seeds.math||0)+'</h4><p>完成数学打卡获得，种出胡萝卜</p></div></div>';
+  h+='<div class="farm-shop-item"><div class="ic">🌻</div><div class="info"><h4>英语种子 x'+(seeds.english||0)+'</h4><p>完成英语打卡获得，种出向日葵</p></div></div>';
+  h+='</div>';
+  h+='<div class="card"><h3>🔧 道具库存</h3>';
+  h+='<div class="farm-shop-item"><div class="ic">🔫</div><div class="info"><h4>杀虫剂 x'+(items.pesticide||0)+'</h4><p>清除小狗熊，恢复作物健康</p></div></div>';
+  h+='<div class="farm-shop-item"><div class="ic">🛡️</div><div class="info"><h4>护盾 x'+(items.shield||0)+'</h4><p>激活后抵挡一次小狗熊攻击</p></div></div>';
+  h+='</div>';
+  h+='<div class="card"><h3>🎨 已解锁皮肤</h3>';
+  if(skins.length===0){h+='<div class="farm-empty">还没有解锁皮肤，去金币商城兑换吧！</div>';}
+  else{skins.forEach(function(s){h+='<div class="farm-shop-item"><div class="ic">'+s.emoji+'</div><div class="info"><h4>'+s.name+'</h4></div></div>';});}
+  h+='</div>';
+  return h;
+}
+
+// 道具商店（阳光兑换）
+function renderFarmShop(){
+  var sun=D.get('farm_sun',0);
+  var streak=D.get('farm_streak',0);
+  var h='<div class="card"><h3>🏪 道具商店</h3><p style="color:var(--text-l);font-size:14px;margin-bottom:10px">当前阳光：'+sun+' 🌞 | 连续打卡：'+streak+'天</p>';
+  // 杀虫剂
+  h+='<div class="farm-shop-item"><div class="ic">🔫</div><div class="info"><h4>杀虫剂</h4><p>清除小狗熊，恢复作物健康度</p></div><button class="buy-btn" '+(sun>=3?'':'disabled')+' onclick="farmBuy(\'pesticide\',3)">3阳光兑换</button></div>';
+  // 护盾
+  var canShield=sun>=5&&streak>=3;
+  h+='<div class="farm-shop-item"><div class="ic">🛡️</div><div class="info"><h4>护盾</h4><p>需要连续打卡3天+5阳光，抵挡一次小狗熊</p></div><button class="buy-btn" '+(canShield?'':'disabled')+' onclick="farmBuy(\'shield\',5)">5阳光兑换</button></div>';
+  h+='</div>';
+  return h;
+}
+
+// 金币商城
+function renderFarmMall(){
+  var coins=D.get('farm_coins',0);
+  var h='<div class="card"><h3>🛒 金币商城</h3><p style="color:var(--text-l);font-size:14px;margin-bottom:10px">当前金币：'+coins+' 🪙</p>';
+  h+='<div class="farm-shop-item"><div class="ic">🏅</div><div class="info"><h4>虚拟奖状</h4><p>"学习小达人"荣誉奖状</p></div><button class="buy-btn" '+(coins>=50?'':'disabled')+' onclick="farmBuySkin(\'奖状\',\'🏅\',50)">50金币</button></div>';
+  h+='<div class="farm-shop-item"><div class="ic">🖼️</div><div class="info"><h4>卡通头像框</h4><p>专属农场头像装饰</p></div><button class="buy-btn" '+(coins>=100?'':'disabled')+' onclick="farmBuySkin(\'头像框\',\'🖼️\',100)">100金币</button></div>';
+  h+='<div class="farm-shop-item"><div class="ic">🎨</div><div class="info"><h4>农场皮肤-星空</h4><p>夜晚星空主题农场背景</p></div><button class="buy-btn" '+(coins>=200?'':'disabled')+' onclick="farmBuySkin(\'星空皮肤\',\'🎨\',200)">200金币</button></div>';
+  h+='</div>';
+  return h;
+}
+
+// 购买道具
+function farmBuy(item,cost){
+  farmInit();
+  var sun=D.get('farm_sun',0);
+  if(sun<cost){toast('阳光不够！');return;}
+  D.set('farm_sun',sun-cost);
+  var items=D.get('farm_items',{pesticide:0,shield:0});
+  items[item]=(items[item]||0)+1;
+  D.set('farm_items',items);
+  toast('兑换成功！'+(item==='pesticide'?'杀虫剂':'护盾')+' x1');
+  updateNav();
+  renderPanel('farm');
+}
+
+// 购买皮肤
+function farmBuySkin(name,emoji,cost){
+  farmInit();
+  var coins=D.get('farm_coins',0);
+  if(coins<cost){toast('金币不够！');return;}
+  // 检查是否已拥有
+  var skins=D.get('farm_unlocked_skins',[]);
+  for(var i=0;i<skins.length;i++){
+    if(skins[i].name===name){toast('已经拥有此物品了！');return;}
+  }
+  D.set('farm_coins',coins-cost);
+  skins.push({name:name,emoji:emoji});
+  D.set('farm_unlocked_skins',skins);
+  toast('🎉 兑换成功！获得'+name);
+  updateNav();
+  renderPanel('farm');
+}
+
 function renderGuide(){
   var h='<div class="ph"><div class="pt">📋 学习指南<span class="sub">每日学习公约</span></div></div>';
   h+='<div class="guide-section"><h3><span class="icon">📌</span>一、每日学习通用指令</h3><ul class="guide-list">'+
@@ -608,7 +1173,7 @@ function updateCalMarks(){if(document.getElementById('p-calendar').classList.con
 // ============ 主渲染 ============
 function renderPanel(name){
   var main=document.getElementById('main');
-  var fns={reading:renderReading,words:renderWords,poems:renderPoems,math:renderMath,science:renderScience,english:renderEnglish,chores:renderChores,pet:renderPet,calendar:renderCalendar,guide:renderGuide};
+  var fns={reading:renderReading,words:renderWords,poems:renderPoems,math:renderMath,science:renderScience,english:renderEnglish,chores:renderChores,pet:renderPet,calendar:renderCalendar,guide:renderGuide,farm:renderFarm};
   var html=fns[name]();
   main.innerHTML=html;
   // 同步导航高亮（避免递归 sw）
@@ -639,6 +1204,9 @@ function init(){
   }
   updateNav();
   renderPanel('reading');
+  // 农场初始化
+  farmInit();
+  farmDailyInit();
   // 首次打开弹出学习公约
   if(!D.get('guideSeen',false)){
     setTimeout(function(){
