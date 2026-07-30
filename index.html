@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f48fb1">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Minnie学习台">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Crect width='120' height='120' rx='28' fill='%23f48fb1'/%3E%3Ccircle cx='45' cy='45' r='6' fill='%23333'/%3E%3Ccircle cx='75' cy='45' r='6' fill='%23333'/%3E%3Cpath d='M40 62 Q60 78 80 62' stroke='%23333' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3Cellipse cx='35' cy='25' rx='8' ry='18' fill='%23fff' transform='rotate(-15 35 25)'/%3E%3Cellipse cx='85' cy='25' rx='8' ry='18' fill='%23fff' transform='rotate(15 85 25)'/%3E%3Cellipse cx='32' cy='22' rx='4' ry='10' fill='%23f8bbd0' transform='rotate(-15 32 22)'/%3E%3Cellipse cx='88' cy='22' rx='4' ry='10' fill='%23f8bbd0' transform='rotate(15 88 22)'/%3E%3C/svg%3E">
+<title>Minnie每日学习工作台</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--bg:#fdf0f5;--card:#fff;--pri:#f48fb1;--pri-d:#ec407a;--pri-l:#fce4ec;--accent:#ffd54f;--text:#4a3b45;--text-l:#ad8a99;--green:#66bb6a;--pink:#f06292;--orange:#ff8a65;--purple:#ab47bc;--r:16px}
+body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);font-size:18px;line-height:1.6;overflow:hidden}
+#app{display:flex;height:100vh;height:100dvh}
+.nav{width:200px;background:#fff;border-right:1px solid #f0d4e0;display:flex;flex-direction:column;padding:8px 0;flex-shrink:0;overflow-y:auto}
+.nav-logo{text-align:center;padding:10px 8px;font-size:17px;font-weight:700;color:var(--pri-d)}
+.nav-logo span{display:block;font-size:11px;color:var(--text-l);font-weight:400;margin-top:2px}
+.nav-item{display:flex;align-items:center;padding:11px 16px;cursor:pointer;transition:all .2s;border-left:4px solid transparent;font-size:15px;gap:8px}
+.nav-item:hover{background:#fdf0f5}
+.nav-item.active{background:var(--pri-l);border-left-color:var(--pri-d);color:var(--pri-d);font-weight:600}
+.nav-item .icon{font-size:20px;width:24px;text-align:center}
+.nav-stat{margin-top:auto;padding:10px 16px;border-top:1px solid #f0d4e0;font-size:12px;color:var(--text-l)}
+.nav-stat b{color:var(--pri-d);font-size:18px}
+.nav-stat .feed{color:var(--orange)}
+.main{flex:1;overflow-y:auto;padding:16px 24px;-webkit-overflow-scrolling:touch}
+.panel{display:none;animation:fade .3s}
+.panel.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.ph{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px}
+.pt{font-size:22px;font-weight:700;color:var(--pri-d)}
+.pt .sub{font-size:13px;color:var(--text-l);font-weight:400;margin-left:6px}
+.card{background:var(--card);border-radius:var(--r);padding:16px 18px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.card h3{color:var(--pri-d);margin-bottom:8px;font-size:17px}
+.btn{display:inline-flex;align-items:center;gap:4px;padding:7px 14px;border:none;border-radius:10px;background:var(--pri);color:#fff;font-size:14px;cursor:pointer;transition:all .2s;font-family:inherit}
+.btn:hover{background:var(--pri-d);transform:translateY(-1px)}
+.btn:active{transform:scale(.96)}
+.btn-sm{padding:5px 10px;font-size:13px}
+.btn-acc{background:var(--accent);color:#5d4037}
+.btn-green{background:var(--green)}
+.btn-pink{background:var(--pink)}
+.btn-orange{background:var(--orange)}
+.ci{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px dashed #f0d4e0}
+.ci:last-child{border-bottom:none}
+.cb{width:26px;height:26px;border:2px solid var(--pri);border-radius:7px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all .2s}
+.cb:hover{background:var(--pri-l)}
+.cb.done{background:var(--green);border-color:var(--green)}
+.cb.done::after{content:"✓";color:#fff;font-size:15px;font-weight:700}
+.it{flex:1;font-size:16px}
+.it.done{text-decoration:line-through;color:var(--text-l)}
+.pb{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.pc{background:#fff;border-radius:12px;padding:7px 14px;display:flex;align-items:center;gap:5px;box-shadow:0 1px 4px rgba(0,0,0,.06);font-size:13px}
+.pc .n{font-size:19px;font-weight:700;color:var(--pri-d)}
+.pc.feed .n{color:var(--orange)}
+.wg{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}
+.wc{background:#fff;border-radius:12px;padding:12px;text-align:center;box-shadow:0 2px 6px rgba(0,0,0,.05)}
+.wc .ch{font-size:30px;font-weight:700;color:var(--pri-d);margin-bottom:2px}
+.wc .py{color:var(--text-l);font-size:13px;margin-bottom:3px}
+.wc .mn{font-size:12px;color:#5d4037}
+.wc .btn-sm{margin-top:6px}
+.pt2{text-align:center;font-size:21px;font-weight:700;margin-bottom:4px}
+.pa{text-align:center;color:var(--text-l);margin-bottom:12px;font-size:14px}
+.pob{text-align:center;font-size:20px;line-height:2;letter-spacing:2px}
+.pot{margin-top:12px;padding:10px 14px;background:#f5f9fc;border-radius:10px;font-size:14px;color:var(--text-l)}
+.mq{font-size:20px;font-weight:600;margin-bottom:8px;text-align:center}
+.ma{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:8px 0}
+.ma input{width:70px;padding:5px 8px;border:2px solid var(--pri);border-radius:8px;font-size:18px;text-align:center;font-family:inherit}
+.ma input:focus{outline:none;border-color:var(--pri-d)}
+.ma .btn{padding:5px 12px}
+.mr{text-align:center;margin-top:6px;font-size:14px;min-height:20px}
+.mr.ok{color:var(--green);font-weight:600}
+.mr.no{color:var(--pink)}
+.en-w{font-size:20px;font-weight:600;color:var(--pri-d)}
+.en-m{color:var(--text-l);margin:3px 0}
+.en-s{background:#f5f9fc;padding:8px 12px;border-radius:8px;font-size:15px;margin-top:5px;line-height:1.5}
+.sci-q{font-size:18px;font-weight:600;margin-bottom:8px}
+.sci-a{padding:10px;background:#f5f9fc;border-radius:8px;font-size:15px;line-height:1.7}
+.pet-a{display:flex;gap:20px;align-items:center;flex-wrap:wrap;justify-content:center;padding:14px}
+.pet-c{width:110px;height:110px;border-radius:50%;background:linear-gradient(135deg,#fff3e0,#ffe0b2);display:flex;align-items:center;justify-content:center;font-size:55px;position:relative}
+.pet-c.happy{background:linear-gradient(135deg,#c8e6c9,#a5d6a7)}
+.pet-c.sad{background:linear-gradient(135deg,#ffcdd2,#ef9a9a)}
+.pet-c .badge{position:absolute;bottom:-4px;right:-4px;width:28px;height:28px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:14px}
+.pbars{width:200px}
+.pbar{margin:5px 0}
+.pbar .lb{display:flex;justify-content:space-between;font-size:12px;margin-bottom:2px}
+.pbar .bg{height:10px;background:#e0e7ee;border-radius:5px;overflow:hidden}
+.pbar .fl{height:100%;border-radius:5px;transition:width .5s}
+.cg{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;max-width:560px}
+.cc{aspect-ratio:1;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer;transition:all .15s;border:2px solid transparent;position:relative}
+.cc.hd{font-weight:600;color:var(--text-l);cursor:default;background:transparent}
+.cc.dy:hover{background:var(--pri-l)}
+.cc.ck{background:var(--green);color:#fff;font-weight:600}
+.cc.td{border-color:var(--pink)}
+.cc .mk{position:absolute;bottom:1px;right:1px;font-size:7px;display:flex;gap:1px}
+.rw{text-align:right;margin-bottom:8px}
+.ri{display:inline-block;width:8px;height:8px;background:var(--green);border-radius:50%;margin-left:5px;animation:pl 1s infinite}
+@keyframes pl{0%,100%{opacity:1}50%{opacity:.3}}
+.toast{position:fixed;top:16px;left:50%;transform:translateX(-50%);background:var(--green);color:#fff;padding:10px 20px;border-radius:12px;font-size:15px;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none}
+.toast.show{opacity:1}
+@media(max-width:768px){
+.nav{width:64px}.nav-item{padding:8px 0;flex-direction:column;font-size:10px;gap:2px}
+.nav-item .icon{font-size:20px}.nav-logo{font-size:12px}.nav-logo span{display:none}
+.nav-stat{font-size:10px;padding:6px 4px}.nav-stat b{font-size:14px}
+.main{padding:10px 12px}.pt{font-size:18px}
+.wg{grid-template-columns:repeat(auto-fill,minmax(100px,1fr))}
+.pob{font-size:18px}.mq{font-size:18px}
+}
+</style>
+</head>
+<body>
+<div id="app">
+<div class="nav">
+<div class="nav-logo">🐰 Minnie<span>每日学习工作台</span></div>
+<div class="nav-item active" data-p="reading" onclick="sw('reading')"><span class="icon">📖</span>阅读专区</div>
+<div class="nav-item" data-p="words" onclick="sw('words')"><span class="icon">🔤</span>生字专区</div>
+<div class="nav-item" data-p="poems" onclick="sw('poems')"><span class="icon">📜</span>三年级古诗</div>
+<div class="nav-item" data-p="math" onclick="sw('math')"><span class="icon">🔢</span>数学专区</div>
+<div class="nav-item" data-p="science" onclick="sw('science')"><span class="icon">🔬</span>科普专区</div>
+<div class="nav-item" data-p="english" onclick="sw('english')"><span class="icon">🅰️</span>英语阅读</div>
+<div class="nav-item" data-p="chores" onclick="sw('chores')"><span class="icon">🧹</span>家务劳动</div>
+<div class="nav-item" data-p="pet" onclick="sw('pet')"><span class="icon">🐰</span>小宠物中心</div>
+<div class="nav-item" data-p="calendar" onclick="sw('calendar')"><span class="icon">📅</span>日历打卡</div>
+<div class="nav-stat">⭐积分<b id="nP">0</b><br>🌾饲料<b class="feed" id="nF">0</b></div>
+</div>
+<div class="main" id="main"></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ============ 数据存储 ============
+var D={
+  load:function(){try{return JSON.parse(localStorage.getItem('minnieData')||'{}')}catch(e){return{}}},
+  save:function(d){localStorage.setItem('minnieData',JSON.stringify(d))},
+  get:function(k,f){var d=this.load();return d[k]!==undefined?d[k]:f},
+  set:function(k,v){var d=this.load();d[k]=v;this.save(d)}
+};
+var today=new Date().toISOString().slice(0,10);
+
+// ============ 积分/饲料 ============
+function addPoints(n,feed){
+  var p=D.get('points',0)+n;
+  D.set('points',p);
+  if(feed){var f=D.get('feed',0)+feed;D.set('feed',f);}
+  updateNav();
+  toast('+'+n+'积分'+(feed?' +'+feed+'饲料🌾':'')+' ⭐');
+}
+function updateNav(){
+  document.getElementById('nP').textContent=D.get('points',0);
+  document.getElementById('nF').textContent=D.get('feed',0);
+}
+
+// ============ 每日种子 ============
+function daySeed(){var d=new Date();return d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();}
+function pick(arr,seed,n){
+  var r=[],s=seed||daySeed(),idx=s%arr.length;
+  for(var i=0;i<Math.min(n||1,arr.length);i++){r.push(arr[(idx+i)%arr.length]);}
+  return r;
+}
+
+// ============ 语音朗读 ============
+var speaking=false;
+function speak(text,rate){
+  if(speaking)window.speechSynthesis.cancel();
+  speaking=true;
+  var u=new SpeechSynthesisUtterance(text);
+  u.lang='zh-CN';u.rate=rate||0.9;u.pitch=1.1;
+  u.onend=function(){speaking=false;};
+  u.onerror=function(){speaking=false;};
+  window.speechSynthesis.speak(u);
+}
+function speakEl(id){var t=document.getElementById(id);if(t)speak(t.textContent);}
+function speakText(t){speak(t);}
+
+// ============ 面板切换 ============
+function sw(name){
+  if(typeof renderPanel==='function'){
+    renderPanel(name);
+  }else{
+    document.querySelectorAll('.nav-item').forEach(function(e){e.classList.remove('active')});
+    var nav=document.querySelector('[data-p="'+name+'"]');if(nav)nav.classList.add('active');
+    document.querySelectorAll('.panel').forEach(function(e){e.classList.remove('active')});
+    var p=document.getElementById('p-'+name);if(p)p.classList.add('active');
+  }
+}
+
+// ============ 打卡 ============
+function isChecked(name){var c=D.get('check_'+today,{});return c[name]||false;}
+function toggleCheck(name){
+  var c=D.get('check_'+today,{});
+  c[name]=!c[name];D.set('check_'+today,c);
+  var el=document.getElementById('chk-'+name);
+  var tx=el?el.nextElementSibling:null;
+  if(c[name]){
+    if(el)el.classList.add('done');
+    if(tx)tx.classList.add('done');
+    addPoints(10,2);
+    if(name!=='pet'&&name!=='calendar')updateCalMarks();
+  }else{
+    if(el)el.classList.remove('done');
+    if(tx)tx.classList.remove('done');
+    var p=D.get('points',0)-10;if(p<0)p=0;D.set('points',p);
+    var f=D.get('feed',0)-2;if(f<0)f=0;D.set('feed',f);
+    updateNav();updateCalMarks();
+  }
+}
+function renderCheck(name,label){
+  var ck=isChecked(name);
+  return '<div class="ci"><div class="cb'+(ck?' done':'')+'" id="chk-'+name+'" onclick="toggleCheck(\''+name+'\')"></div><div class="it'+(ck?' done':'')+'">'+label+'</div></div>';
+}
+
+// ============ Toast ============
+function toast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2000);}
+
+// ============ 内容库 ============
+var READINGS=[
+  {t:'小松鼠的秋天',b:'秋天到了，小松鼠蹦蹦跳跳地在森林里找松果。它把一颗颗松果藏在树洞里，准备冬天吃。小鸟问它："你为什么存这么多食物呀？"小松鼠笑着说："冬天食物不好找，我要提前准备好呀！"小朋友，我们也要学会提前计划哦。'},
+  {t:'神奇的种子',b:'小明在花盆里种了一颗种子。他每天浇水、晒太阳。一天天过去，种子发芽了，长出了嫩绿的小叶子。小明开心极了！他发现，只要耐心等待和用心照顾，就会看到美好的结果。'},
+  {t:'月亮姐姐的礼物',b:'月亮姐姐每天晚上都会出来，给小朋友们送去温柔的光。有一天，一颗小星星对月亮说："姐姐，你为什么总是发光呀？"月亮笑着说："因为我想让怕黑的孩子不害怕呀。"月亮真好，她用光照亮了黑夜。'},
+  {t:'勇敢的小蚂蚁',b:'一只小蚂蚁要搬一块比它大很多的面包屑。它试了好几次都搬不动。但它没有放弃，叫来了小伙伴一起搬。大家齐心协力，终于把面包搬回了家。小蚂蚁明白了：团结就是力量！'},
+  {t:'会飞的书包',b:'小华做了一个梦，梦见自己的书包长出了翅膀，带着她飞上了天空。她们飞过高山，飞过大海，看到了好多有趣的地方。醒来后，小华觉得读书也能带她去很多有趣的地方呢！'},
+  {t:'彩虹的颜色',b:'下雨后，天边出现了一道美丽的彩虹。红、橙、黄、绿、青、蓝、紫，七种颜色排成一排。小红问妈妈："彩虹为什么有这么多颜色？"妈妈说："那是阳光穿过雨滴变出来的呀！"大自然真神奇！'},
+  {t:'小猫钓鱼',b:'小猫和妈妈去河边钓鱼。一只蝴蝶飞过来，小猫去追蝴蝶；一只蜻蜓飞过来，小猫又去追蜻蜓。结果一条鱼也没钓到。妈妈说："做事要专心，不能三心二意。"小猫听了，认真钓鱼，果然钓到了大鱼！'},
+  {t:'春天的秘密',b:'春天来了，小草偷偷从土里钻出来，树枝上长出了嫩芽。小燕子从南方飞回来了，在屋檐下做窝。小红发现，春天到处都是新生命。她说："春天是一个藏着很多秘密的季节！"'}
+];
+var WORDS=[
+  {ch:'晨',py:'chén',mn:'早晨、清晨'},{ch:'迎',py:'yíng',mn:'迎接、欢迎'},{ch:'寒',py:'hán',mn:'寒冷、冬天'},
+  {ch:'径',py:'jìng',mn:'小路、路径'},{ch:'斜',py:'xié',mn:'歪斜、不正'},{ch:'霜',py:'shuāng',mn:'霜、冰霜'},
+  {ch:'赠',py:'zèng',mn:'赠送、给予'},{ch:'刘',py:'liú',mn:'姓氏'},{ch:'景',py:'jǐng',mn:'风景、景色'},
+  {ch:'挑',py:'tiāo',mn:'挑选、挑担'},{ch:'拟',py:'nǐ',mn:'模仿、比拟'},{ch:'泥',py:'ní',mn:'泥土、泥巴'},
+  {ch:'棕',py:'zōng',mn:'棕色'},{ch:'晒',py:'shài',mn:'晒太阳'},{ch:'醒',py:'xǐng',mn:'醒来、清醒'},
+  {ch:'刮',py:'guā',mn:'刮风、刮脸'},{ch:'盖',py:'gài',mn:'盖子、覆盖'},{ch:'躺',py:'tǎng',mn:'躺下、平躺'},
+  {ch:'幻',py:'huàn',mn:'幻想、变幻'},{ch:'焰',py:'yàn',mn:'火焰、光焰'},{ch:'退',py:'tuì',mn:'后退、退步'},
+  {ch:'减',py:'jiǎn',mn:'减少、减法'},{ch:'怒',py:'nù',mn:'发怒、愤怒'},{ch:'迈',py:'mài',mn:'迈步、年迈'},
+  {ch:'聚',py:'jù',mn:'聚集、相聚'},{ch:'秒',py:'miǎo',mn:'秒、时间单位'},{ch:'查',py:'chá',mn:'检查、查找'},
+  {ch:'速',py:'sù',mn:'速度、快速'},{ch:'历',py:'lì',mn:'日历、历史'},{ch:'驾',py:'jià',mn:'驾驶、驾驭'},
+  {ch:'输',py:'shū',mn:'输赢、运输'},{ch:'努',py:'nǔ',mn:'努力、尽力'},{ch:'励',py:'lì',mn:'鼓励、奖励'},
+  {ch:'续',py:'xù',mn:'继续、持续'},{ch:'断',py:'duàn',mn:'断开、折断'},{ch:'耐',py:'nài',mn:'耐心、忍耐'}
+];
+var POEMS=[
+  {t:'山行',a:'唐·杜牧',b:'远上寒山石径斜，\n白云生处有人家。\n停车坐爱枫林晚，\n霜叶红于二月花。',tr:'沿着弯弯曲曲的小路登上寒冷的高山，在白云升起的地方隐约有几户人家。停下马车是因为喜爱这傍晚的枫林，经霜的枫叶比二月的春花还要红艳。'},
+  {t:'赠刘景文',a:'宋·苏轼',b:'荷尽已无擎雨盖，\n菊残犹有傲霜枝。\n一年好景君须记，\n最是橙黄橘绿时。',tr:'荷花凋谢了，再也没有撑雨的荷叶；菊花枯萎了，还有傲霜的枝条。你一定要记住一年中最好的景色，那就是橙子金黄、橘子青绿的时候。'},
+  {t:'夜书所见',a:'宋·叶绍翁',b:'萧萧梧叶送寒声，\n江上秋风动客情。\n知有儿童挑促织，\n夜深篱落一灯明。',tr:'梧桐树的叶子发出萧萧的响声，送来阵阵寒意；江面上的秋风让人思念家乡。知道有小孩在捉蟋蟀，深夜的篱笆旁有一盏灯亮着。'},
+  {t:'望天门山',a:'唐·李白',b:'天门中断楚江开，\n碧水东流至此回。\n两岸青山相对出，\n孤帆一片日边来。',tr:'天门山被长江从中间断开，碧绿的江水向东流到这里回旋。两岸的青山相对而出，一片孤帆从太阳那边驶来。'},
+  {t:'饮湖上初晴后雨',a:'宋·苏轼',b:'水光潋滟晴方好，\n山色空蒙雨亦奇。\n欲把西湖比西子，\n淡妆浓抹总相宜。',tr:'晴天时西湖水波荡漾很美丽，雨天时山色朦胧也很奇妙。如果把西湖比作西施，不管淡妆还是浓抹都很合适。'},
+  {t:'望洞庭',a:'唐·刘禹锡',b:'湖光秋月两相和，\n潭面无风镜未磨。\n遥望洞庭山水翠，\n白银盘里一青螺。',tr:'洞庭湖的湖光和秋月交相辉映，湖面没有风就像没有打磨的铜镜。远看洞庭湖的山水一片翠绿，就像白银盘里放着一只青色的螺。'},
+  {t:'绝句',a:'唐·杜甫',b:'两个黄鹂鸣翠柳，\n一行白鹭上青天。\n窗含西岭千秋雪，\n门泊东吴万里船。',tr:'两只黄鹂在翠绿的柳枝上鸣叫，一行白鹭飞上蓝天。窗户里能看到西岭上千年不化的积雪，门前停着从东吴来的万里船。'},
+  {t:'惠崇春江晚景',a:'宋·苏轼',b:'竹外桃花三两枝，\n春江水暖鸭先知。\n蒌蒿满地芦芽短，\n正是河豚欲上时。',tr:'竹林外开了两三枝桃花，鸭子在江里游玩，最先知道水变暖了。满地都是蒌蒿，芦芽刚长出来，正是河豚要逆流而上的时候。'}
+];
+var SCIENCES=[
+  {q:'为什么天空是蓝色的？',a:'太阳光看起来是白色的，其实是由红、橙、黄、绿、青、蓝、紫七种颜色组成的。当阳光穿过大气层时，空气中的气体分子会把蓝色的光散射到四面八方。所以我们抬头看天，到处都是蓝色，天空就是蓝色的啦！'},
+  {q:'为什么会下雨？',a:'太阳把地面的水晒热，水就变成了水蒸气升到天上。天上的温度比较低，水蒸气就变成小水滴。很多小水滴聚在一起就变成了云。当云里的水滴越来越大、越来越重，空气托不住它们时，就会掉下来变成雨。'},
+  {q:'为什么树叶秋天会变黄？',a:'树叶里有一种叫叶绿素的东西，它能让叶子变成绿色。到了秋天，天气变冷，白天变短，叶绿素就被破坏了。叶子里还有黄色的色素就露出来了，所以叶子就变黄了。有些叶子还会变成红色呢！'},
+  {q:'为什么彩虹是弧形的？',a:'阳光穿过雨滴时会发生折射和反射，每种颜色的光折射的角度不一样。当我们背对太阳看雨滴时，只有特定角度的光能进入我们的眼睛，这些光形成一个圆弧形。在地面上我们只能看到半个弧，其实完整的彩虹是一个圆哦！'},
+  {q:'为什么先看到闪电再听到雷声？',a:'闪电和打雷是同时发生的。但是光的传播速度非常快，每秒能跑30万公里，一眨眼就到了。声音的速度慢很多，每秒只能跑340米。所以光先到我们眼睛，声音后到我们耳朵，我们就先看到闪电再听到雷声了。'},
+  {q:'为什么鸟能飞？',a:'鸟能飞有三个秘密：第一，鸟的骨头是空心的，身体很轻；第二，鸟有翅膀，翅膀的形状能让空气从上面流得快、下面流得慢，产生向上的力；第三，鸟的胸肌非常发达，能有力地扇动翅膀。'},
+  {q:'为什么海水是咸的？',a:'海水之所以是咸的，是因为里面有很多盐。这些盐是从哪里来的呢？雨水流过岩石和土壤，把里面的盐分冲到河里，河水又流到海里。水会蒸发，但盐不会蒸发，盐就慢慢留在海里了。经过几亿年，海水就变得很咸了。'},
+  {q:'为什么人会打喷嚏？',a:'打喷嚏是身体的一种保护反应。当我们的鼻子受到刺激时，比如有灰尘、花粉或者冷空气进入鼻腔，鼻子里面的神经就会告诉大脑。大脑就会命令肺部用力呼气，把那些不舒服的东西喷出来。打一个喷嚏就是在保护我们的身体哦！'}
+];
+var ENGLISH=[
+  {w:'family',m:'家庭',s:'I love my family.我爱我的家庭。'},
+  {w:'school',m:'学校',s:'I go to school every day.我每天去上学。'},
+  {w:'friend',m:'朋友',s:'She is my best friend.她是我最好的朋友。'},
+  {w:'happy',m:'开心的',s:'I am very happy today.我今天很开心。'},
+  {w:'book',m:'书',s:'This is a good book.这是一本好书。'},
+  {w:'water',m:'水',s:'Please drink more water.请多喝水。'},
+  {w:'sun',m:'太阳',s:'The sun is very bright.太阳很亮。'},
+  {w:'tree',m:'树',s:'The tree is very tall.这棵树很高。'},
+  {w:'cat',m:'猫',s:'The cat is on the chair.猫在椅子上。'},
+  {w:'milk',m:'牛奶',s:'I drink milk every morning.我每天早上喝牛奶。'},
+  {w:'rain',m:'雨',s:'It is raining outside.外面在下雨。'},
+  {w:'color',m:'颜色',s:'What is your favorite color?你最喜欢什么颜色？'},
+  {w:'teacher',m:'老师',s:'My teacher is very kind.我的老师很和蔼。'},
+  {w:'read',m:'阅读',s:'I like to read books.我喜欢读书。'},
+  {w:'play',m:'玩耍',s:'Let us play together.我们一起玩吧。'}
+];
+var CHORES=[
+  {t:'整理自己的书包',d:'把明天的课本和文具放好'},
+  {t:'帮妈妈摆碗筷',d:'吃饭前把碗筷摆到桌上'},
+  {t:'整理书桌',d:'把书本摆放整齐，擦干净桌面'},
+  {t:'扫地',d:'把自己的房间扫一扫'},
+  {t:'叠衣服',d:'帮妈妈叠干净的衣物'},
+  {t:'给植物浇水',d:'给家里的花草浇浇水'},
+  {t:'整理玩具',d:'把玩具放回收纳箱'},
+  {t:'擦桌子',d:'饭后帮忙擦餐桌'},
+  {t:'倒垃圾',d:'把垃圾分类丢到垃圾桶'},
+  {t:'洗自己的小袜子',d:'动手洗自己的袜子'}
+];
+
+// ============ 数学出题 ============
+function genMath(){
+  var s=daySeed();
+  var qs=[];
+  for(var i=0;i<6;i++){
+    var a=((s+i*7)%80)+20;
+    var b=((s+i*13)%60)+10;
+    var op=(s+i)%3;
+    var q,ans;
+    if(op===0){q=a+' + '+b+' = ?';ans=a+b;}
+    else if(op===1){if(a<b){var t=a;a=b;b=t;}q=a+' − '+b+' = ?';ans=a-b;}
+    else{var c=((s+i*3)%8)+2;var r=a*c;q=c+' × '+a+' = ?';ans=r;}
+    qs.push({q:q,a:ans});
+  }
+  return qs;
+}
+
+// ============ 渲染面板 ============
+function renderReading(){
+  var r=pick(READINGS,daySeed(),1)[0];
+  return '<div class="ph"><div class="pt">📖 阅读专区<span class="sub">每天读一篇好文章</span></div><button class="btn btn-sm" onclick="speakEl(\'rdB\')">🔊 朗读全文</button></div>'+
+    '<div class="card"><h3 id="rdT">'+r.t+'</h3><p id="rdB" style="text-indent:2em;line-height:1.8;font-size:17px">'+r.b+'</p></div>'+
+    '<div class="card">'+renderCheck('reading','完成今日阅读')+'</div>';
+}
+function renderWords(){
+  var ws=pick(WORDS,daySeed(),8);
+  var h='<div class="ph"><div class="pt">🔤 生字专区<span class="sub">点击🔊听读音</span></div><button class="btn btn-sm" onclick="sw(\'words\');renderPanel(\'words\')">🔄 刷新题库</button></div><div class="wg">';
+  ws.forEach(function(w,i){
+    h+='<div class="wc"><div class="ch">'+w.ch+'</div><div class="py">'+w.py+'</div><div class="mn">'+w.mn+'</div><button class="btn btn-sm" onclick="speakText(\''+w.ch+'\')">🔊 读</button></div>';
+  });
+  h+='</div><div class="card">'+renderCheck('words','完成今日生字学习')+'</div>';
+  return h;
+}
+function renderPoems(){
+  var p=pick(POEMS,daySeed(),1)[0];
+  return '<div class="ph"><div class="pt">📜 三年级古诗<span class="sub">每日一首</span></div><button class="btn btn-sm" onclick="speakPoem()">🔊 朗读</button></div>'+
+    '<div class="card"><div class="pt2" id="pmT">'+p.t+'</div><div class="pa" id="pmA">'+p.a+'</div><div class="pob" id="pmB">'+p.b.replace(/\n/g,'<br>')+'</div><div class="pot" id="pmTr">'+p.tr+'</div></div>'+
+    '<div class="card">'+renderCheck('poems','完成今日古诗背诵')+'</div>';
+}
+function speakPoem(){
+  var t=document.getElementById('pmT').textContent;
+  var b=document.getElementById('pmB').textContent;
+  speak(t+'。'+b.replace(/\n/g,'，'),0.7);
+}
+function renderMath(){
+  var qs=genMath();
+  var h='<div class="ph"><div class="pt">🔢 数学专区<span class="sub">动脑做题</span></div><button class="btn btn-sm" onclick="renderPanel(\'math\')">🔄 换题</button></div>';
+  qs.forEach(function(q,i){
+    h+='<div class="card"><div class="mq">第'+(i+1)+'题：'+q.q+'</div><div class="ma"><input type="number" id="ma'+i+'" placeholder="答案"><button class="btn btn-sm btn-green" onclick="checkMath('+i+','+q.a+')">确认</button></div><div class="mr" id="mr'+i+'"></div></div>';
+  });
+  h+='<div class="card">'+renderCheck('math','完成今日数学练习')+'</div>';
+  return h;
+}
+function checkMath(i,ans){
+  var inp=document.getElementById('ma'+i);
+  var r=document.getElementById('mr'+i);
+  var v=parseInt(inp.value);
+  if(isNaN(v)){r.textContent='请输入数字';r.className='mr no';return;}
+  if(v===ans){r.textContent='✅ 正确！太棒了！';r.className='mr ok';}
+  else{r.textContent='❌ 再想想哦～';r.className='mr no';}
+}
+function renderScience(){
+  var s=pick(SCIENCES,daySeed(),2);
+  var h='<div class="ph"><div class="pt">🔬 科普专区<span class="sub">探索大千世界</span></div><button class="btn btn-sm" onclick="speakAllSci()">🔊 全部朗读</button></div>';
+  s.forEach(function(x,i){
+    h+='<div class="card"><div class="sci-q" id="scQ'+i+'">'+(i+1)+'. '+x.q+'</div><div class="sci-a" id="scA'+i+'">'+x.a+'</div><button class="btn btn-sm" style="margin-top:8px" onclick="speakEl(\'scA'+i+'\')">🔊 朗读</button></div>';
+  });
+  h+='<div class="card">'+renderCheck('science','完成今日科普阅读')+'</div>';
+  return h;
+}
+function speakAllSci(){
+  var t='';
+  for(var i=0;i<2;i++){var a=document.getElementById('scA'+i);if(a)t+=a.textContent+' ';}
+  speak(t,0.85);
+}
+function renderEnglish(){
+  var ws=pick(ENGLISH,daySeed(),4);
+  var h='<div class="ph"><div class="pt">🅰️ 英语阅读打卡<span class="sub">每日单词+句子</span></div><button class="btn btn-sm" onclick="speakAllEn()">🔊 全部朗读</button></div>';
+  ws.forEach(function(w,i){
+    h+='<div class="card"><div class="en-w" id="enW'+i+'">'+w.w+' <button class="btn btn-sm" onclick="speakText(\''+w.w+'\',1)">🔊</button></div><div class="en-m">'+w.m+'</div><div class="en-s" id="enS'+i+'">'+w.s+'</div><button class="btn btn-sm" style="margin-top:6px" onclick="speakText(\''+w.s.replace(/'/g,"\\'")+'\',0.9)">🔊 读句子</button></div>';
+  });
+  h+='<div class="card">'+renderCheck('english','完成今日英语打卡')+'</div>';
+  return h;
+}
+function speakAllEn(){
+  var ws=pick(ENGLISH,daySeed(),4);
+  var t=ws.map(function(w){return w.w+'. '+w.s;}).join('. ');
+  speak(t,0.85);
+}
+function renderChores(){
+  var cs=pick(CHORES,daySeed(),3);
+  var h='<div class="ph"><div class="pt">🧹 家务劳动<span class="sub">我是劳动小能手</span></div></div>';
+  cs.forEach(function(c,i){
+    h+='<div class="card"><h3>'+c.t+'</h3><p style="color:var(--text-l)">'+c.d+'</p><div style="margin-top:8px">'+renderCheck('chores'+i,c.t)+'</div></div>';
+  });
+  return h;
+}
+function renderPet(){
+  var happy=D.get('pet_happy',50);
+  var full=D.get('pet_full',50);
+  var clean=D.get('pet_clean',50);
+  var mood=happy>30&&full>30&&clean>30?'happy':'sad';
+  var face=happy>30&&full>30&&clean>30?'🐰':'😰';
+  var h='<div class="ph"><div class="pt">🐰 小宠物中心<span class="sub">照顾好你的小伙伴</span></div></div>';
+  h+='<div class="card"><div class="pet-a"><div class="pet-c '+mood+'">'+face+'<div class="badge">'+(happy>60?'⭐':'')+'</div></div>';
+  h+='<div class="pbars">'+
+    '<div class="pbar"><div class="lb"><span>😊 开心值</span><span>'+happy+'/100</span></div><div class="bg"><div class="fl" style="width:'+happy+'%;background:#ffd54f"></div></div></div>'+
+    '<div class="pbar"><div class="lb"><span>🍖 饱腹值</span><span>'+full+'/100</span></div><div class="bg"><div class="fl" style="width:'+full+'%;background:#ff8a65"></div></div></div>'+
+    '<div class="pbar"><div class="lb"><span>🧼 清洁值</span><span>'+clean+'/100</span></div><div class="bg"><div class="fl" style="width:'+clean+'%;background:#4fc3f7"></div></div></div>'+
+    '</div></div>';
+  h+='<div style="text-align:center;margin-top:10px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">'+
+    '<button class="btn btn-sm btn-pink" onclick="petAction(\'play\')">🎾 陪玩(+开心)</button>'+
+    '<button class="btn btn-sm btn-orange" onclick="petAction(\'feed\')">🍎 喂食(+饱腹)</button>'+
+    '<button class="btn btn-sm" onclick="petAction(\'wash\')">🧼 洗澡(+清洁)</button>'+
+    '</div></div>';
+  h+='<div class="card" style="text-align:center"><p style="color:var(--text-l);font-size:14px">每次陪玩/喂食/洗澡消耗2饲料<br>完成学习任务可获得饲料🌾</p></div>';
+  return h;
+}
+function petAction(act){
+  var feed=D.get('feed',0);
+  if(feed<2){toast('饲料不够啦！完成学习任务获取饲料🌾');return;}
+  feed-=2;D.set('feed',feed);
+  if(act==='play'){var v=D.get('pet_happy',50)+15;if(v>100)v=100;D.set('pet_happy',v);toast('兔子玩得很开心！+15开心值😊');}
+  if(act==='feed'){var v=D.get('pet_full',50)+15;if(v>100)v=100;D.set('pet_full',v);toast('兔子吃饱啦！+15饱腹值🍖');}
+  if(act==='wash'){var v=D.get('pet_clean',50)+15;if(v>100)v=100;D.set('pet_clean',v);toast('兔子洗得干干净净！+15清洁值🧼');}
+  updateNav();renderPanel('pet');
+  // 自动衰减：每次操作其他值略降
+  var h=D.get('pet_happy',50)-2;if(h<0)h=0;D.set('pet_happy',h);
+  var f=D.get('pet_full',50)-2;if(f<0)f=0;D.set('pet_full',f);
+  setTimeout(function(){renderPanel('pet');},100);
+}
+function renderCalendar(){
+  var now=new Date();
+  var y=now.getFullYear(),m=now.getMonth();
+  var first=new Date(y,m,1).getDay();
+  var days=new Date(y,m+1,0).getDate();
+  var heads=['日','一','二','三','四','五','六'];
+  var h='<div class="ph"><div class="pt">📅 日历打卡<span class="sub">'+y+'年'+(m+1)+'月</span></div></div>';
+  h+='<div class="card"><div class="cg">';
+  heads.forEach(function(d){h+='<div class="cc hd">'+d+'</div>';});
+  for(var i=0;i<first;i++){h+='<div class="cc empty"></div>';}
+  for(var d=1;d<=days;d++){
+    var ds=y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    var ck=D.get('check_'+ds,{});
+    var marks=[];
+    if(ck.reading)marks.push('📖');
+    if(ck.words)marks.push('🔤');
+    if(ck.poems)marks.push('📜');
+    if(ck.math)marks.push('🔢');
+    if(ck.science)marks.push('🔬');
+    if(ck.english)marks.push('🅰️');
+    var cls='cc dy';
+    if(Object.keys(ck).length>0)cls+=' ck';
+    if(ds===today)cls+=' td';
+    h+='<div class="'+cls+'" onclick="calClick(\''+ds+'\')">'+d+'<div class="mk">'+marks.join('')+'</div></div>';
+  }
+  h+='</div></div>';
+  var mc=0;
+  for(var d2=1;d2<=days;d2++){
+    var ds2=y+'-'+String(m+1).padStart(2,'0')+'-'+String(d2).padStart(2,'0');
+    if(D.get('check_'+ds2,{}).reading)mc++;
+  }
+  h+='<div class="card" style="text-align:center"><p>本月已打卡 <b style="color:var(--green);font-size:22px">'+mc+'</b> 天 🎉</p></div>';
+  return h;
+}
+function calClick(ds){
+  if(ds===today){toast('今天是今天，去完成今天的学习吧！');return;}
+  var ck=D.get('check_'+ds,{});
+  var n=Object.keys(ck).length;
+  toast(ds+' 完成了'+n+'项打卡');
+}
+function updateCalMarks(){if(document.getElementById('p-calendar').classList.contains('active'))renderPanel('calendar');}
+
+// ============ 主渲染 ============
+function renderPanel(name){
+  var main=document.getElementById('main');
+  var fns={reading:renderReading,words:renderWords,poems:renderPoems,math:renderMath,science:renderScience,english:renderEnglish,chores:renderChores,pet:renderPet,calendar:renderCalendar};
+  var html=fns[name]();
+  main.innerHTML=html;
+  // 同步导航高亮（避免递归 sw）
+  document.querySelectorAll('.nav-item').forEach(function(e){e.classList.remove('active')});
+  var nav=document.querySelector('[data-p="'+name+'"]');
+  if(nav)nav.classList.add('active');
+}
+
+// ============ 刷新题库（手动重置） ============
+function refreshPanel(name){
+  // 生成新随机种子覆盖当天
+  var newSeed=Math.floor(Math.random()*100000);
+  D.set('refresh_'+today+'_'+name,newSeed);
+  renderPanel(name);
+  toast('题目已刷新 🔄');
+}
+
+// ============ 初始化 ============
+function init(){
+  // 首次打开或新一天：初始化
+  var lastDay=D.get('lastDay','');
+  if(lastDay!==today){
+    D.set('lastDay',today);
+    // 宠物状态衰减（每天打开略降）
+    var h=D.get('pet_happy',50)-5;if(h<0)h=0;D.set('pet_happy',h);
+    var f=D.get('pet_full',50)-5;if(f<0)f=0;D.set('pet_full',f);
+    var c=D.get('pet_clean',50)-5;if(c<0)c=0;D.set('pet_clean',c);
+  }
+  updateNav();
+  renderPanel('reading');
+}
+// 覆盖pick：支持手动刷新种子
+var _origPick=pick;
+pick=function(arr,seed,n){
+  // 检查是否有刷新种子
+  var key='refresh_'+today+'_'+getCurrentPanelName();
+  var rs=D.get(key,0);
+  if(rs)seed=rs;
+  return _origPick(arr,seed,n);
+};
+function getCurrentPanelName(){
+  var a=document.querySelector('.nav-item.active');
+  return a?a.getAttribute('data-p'):'reading';
+}
+// 语音朗读英文
+function speakText(text,rate){
+  if(speaking)window.speechSynthesis.cancel();
+  speaking=true;
+  var u=new SpeechSynthesisUtterance(text);
+  // 英文用en-US，中文用zh-CN
+  u.lang=/^[a-zA-Z]/.test(text)?'en-US':'zh-CN';
+  u.rate=rate||0.9;u.pitch=1.1;
+  u.onend=function(){speaking=false;};
+  u.onerror=function(){speaking=false;};
+  window.speechSynthesis.speak(u);
+}
+init();
+</script>
+</body>
+</html>
