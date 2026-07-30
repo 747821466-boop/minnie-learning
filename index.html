@@ -106,6 +106,23 @@ body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;backgr
 .wg{grid-template-columns:repeat(auto-fill,minmax(100px,1fr))}
 .pob{font-size:18px}.mq{font-size:18px}
 }
+.tip-bar{background:linear-gradient(135deg,#fff3e0,#ffe0b2);border-left:4px solid #ff8a65;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:14px;color:#5d4037;line-height:1.6}
+.tip-bar b{color:#e65100}
+.tip-bar .emoji{margin-right:4px}
+.guide-section{background:#fff;border-radius:var(--r);padding:16px 18px;margin-bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.guide-section h3{color:var(--pri-d);font-size:17px;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.guide-section h3 .icon{font-size:22px}
+.guide-list{list-style:none;padding:0;margin:0}
+.guide-list li{padding:6px 0 6px 22px;position:relative;font-size:15px;line-height:1.7;color:var(--text)}
+.guide-list li::before{content:'';position:absolute;left:4px;top:13px;width:8px;height:8px;border-radius:50%;background:var(--pri)}
+.guide-list li b{color:var(--pri-d)}
+.timer-bar{position:fixed;top:0;left:0;right:0;height:3px;background:var(--pri);z-index:998;transition:width 1s linear}
+.timer-bar.rest{background:var(--green)}
+.break-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:997;display:flex;align-items:center;justify-content:center}
+.break-box{background:#fff;border-radius:20px;padding:30px;text-align:center;max-width:320px}
+.break-box .emoji{font-size:50px;margin-bottom:10px}
+.break-box h3{color:var(--green);font-size:20px;margin-bottom:8px}
+.break-box p{color:var(--text-l);font-size:14px;margin-bottom:16px}
 </style>
 </head>
 <body>
@@ -121,11 +138,21 @@ body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;backgr
 <div class="nav-item" data-p="chores" onclick="sw('chores')"><span class="icon">🧹</span>家务劳动</div>
 <div class="nav-item" data-p="pet" onclick="sw('pet')"><span class="icon">🐰</span>小宠物中心</div>
 <div class="nav-item" data-p="calendar" onclick="sw('calendar')"><span class="icon">📅</span>日历打卡</div>
-<div class="nav-stat">⭐积分<b id="nP">0</b><br>🌾饲料<b class="feed" id="nF">0</b></div>
+<div class="nav-item" data-p="guide" onclick="sw('guide')"><span class="icon">📋</span>学习指南</div>
+<div class="nav-stat">⭐积分<b id="nP">0</b><br>🌾饲料<b class="feed" id="nF">0</b><br><span id="timerDisp" style="font-size:11px;color:var(--purple)"></span></div>
 </div>
 <div class="main" id="main"></div>
 </div>
 <div class="toast" id="toast"></div>
+<div class="timer-bar" id="timerBar" style="width:0;display:none"></div>
+<div class="break-overlay" id="breakOverlay" style="display:none">
+<div class="break-box">
+<div class="emoji">🌿</div>
+<h3>休息时间到啦！</h3>
+<p>你已经学习了25分钟，<br>远眺放松5分钟，保护眼睛哦～</p>
+<button class="btn btn-green" onclick="endBreak()">好的，休息完毕</button>
+</div>
+</div>
 
 <script>
 // ============ 数据存储 ============
@@ -308,12 +335,14 @@ function genMath(){
 function renderReading(){
   var r=pick(READINGS,daySeed(),1)[0];
   return '<div class="ph"><div class="pt">📖 阅读专区<span class="sub">每天读一篇好文章</span></div><button class="btn btn-sm" onclick="speakEl(\'rdB\')">🔊 朗读全文</button></div>'+
+    '<div class="tip-bar"><b>📖 学习提示：</b>先整理桌面文具再开始；先看题目，轻声朗读一遍要求；遇到不会的先标记，做完再查阅。</div>'+
     '<div class="card"><h3 id="rdT">'+r.t+'</h3><p id="rdB" style="text-indent:2em;line-height:1.8;font-size:17px">'+r.b+'</p></div>'+
     '<div class="card">'+renderCheck('reading','完成今日阅读')+'</div>';
 }
 function renderWords(){
   var ws=pick(WORDS,daySeed(),8);
-  var h='<div class="ph"><div class="pt">🔤 生字专区<span class="sub">点击🔊听读音</span></div><button class="btn btn-sm" onclick="sw(\'words\');renderPanel(\'words\')">🔄 刷新题库</button></div><div class="wg">';
+  var h='<div class="ph"><div class="pt">🔤 生字专区<span class="sub">点击🔊听读音</span></div><button class="btn btn-sm" onclick="sw(\'words\');renderPanel(\'words\')">🔄 刷新题库</button></div>';
+  h+='<div class="tip-bar"><b>🔤 语文指令：</b>生字先观察笔顺，书空3遍，再动笔书写；每个生字组2个常用词语，口头造句。</div><div class="wg">';
   ws.forEach(function(w,i){
     h+='<div class="wc"><div class="ch">'+w.ch+'</div><div class="py">'+w.py+'</div><div class="mn">'+w.mn+'</div><button class="btn btn-sm" onclick="speakText(\''+w.ch+'\')">🔊 读</button></div>';
   });
@@ -323,6 +352,7 @@ function renderWords(){
 function renderPoems(){
   var p=pick(POEMS,daySeed(),1)[0];
   return '<div class="ph"><div class="pt">📜 三年级古诗<span class="sub">每日一首</span></div><button class="btn btn-sm" onclick="speakPoem()">🔊 朗读</button></div>'+
+    '<div class="tip-bar"><b>📜 古诗指令：</b>先听朗读，分句理解意思，再背诵默写。点击语音朗读跟着读。</div>'+
     '<div class="card"><div class="pt2" id="pmT">'+p.t+'</div><div class="pa" id="pmA">'+p.a+'</div><div class="pob" id="pmB">'+p.b.replace(/\n/g,'<br>')+'</div><div class="pot" id="pmTr">'+p.tr+'</div></div>'+
     '<div class="card">'+renderCheck('poems','完成今日古诗背诵')+'</div>';
 }
@@ -334,6 +364,7 @@ function speakPoem(){
 function renderMath(){
   var qs=genMath();
   var h='<div class="ph"><div class="pt">🔢 数学专区<span class="sub">动脑做题</span></div><button class="btn btn-sm" onclick="renderPanel(\'math\')">🔄 换题</button></div>';
+  h+='<div class="tip-bar"><b>🔢 数学指令：</b>先审题，书写竖式，做完自行验算；应用题圈画已知条件，分步写出思路；错题单独标记，当天回看错误原因。</div>';
   qs.forEach(function(q,i){
     h+='<div class="card"><div class="mq">第'+(i+1)+'题：'+q.q+'</div><div class="ma"><input type="number" id="ma'+i+'" placeholder="答案"><button class="btn btn-sm btn-green" onclick="checkMath('+i+','+q.a+')">确认</button></div><div class="mr" id="mr'+i+'"></div></div>';
   });
@@ -351,6 +382,7 @@ function checkMath(i,ans){
 function renderScience(){
   var s=pick(SCIENCES,daySeed(),2);
   var h='<div class="ph"><div class="pt">🔬 科普专区<span class="sub">探索大千世界</span></div><button class="btn btn-sm" onclick="speakAllSci()">🔊 全部朗读</button></div>';
+  h+='<div class="tip-bar"><b>🔬 科普指令：</b>静心完成，不中途切换页面；听完后试着用自己的话复述知识点。</div>';
   s.forEach(function(x,i){
     h+='<div class="card"><div class="sci-q" id="scQ'+i+'">'+(i+1)+'. '+x.q+'</div><div class="sci-a" id="scA'+i+'">'+x.a+'</div><button class="btn btn-sm" style="margin-top:8px" onclick="speakEl(\'scA'+i+'\')">🔊 朗读</button></div>';
   });
@@ -365,6 +397,7 @@ function speakAllSci(){
 function renderEnglish(){
   var ws=pick(ENGLISH,daySeed(),4);
   var h='<div class="ph"><div class="pt">🅰️ 英语阅读打卡<span class="sub">每日单词+句子</span></div><button class="btn btn-sm" onclick="speakAllEn()">🔊 全部朗读</button></div>';
+  h+='<div class="tip-bar"><b>🅰️ 英语指令：</b>点击语音朗读，跟着发音跟读；完成打卡领取积分与小奖励。</div>';
   ws.forEach(function(w,i){
     h+='<div class="card"><div class="en-w" id="enW'+i+'">'+w.w+' <button class="btn btn-sm" onclick="speakText(\''+w.w+'\',1)">🔊</button></div><div class="en-m">'+w.m+'</div><div class="en-s" id="enS'+i+'">'+w.s+'</div><button class="btn btn-sm" style="margin-top:6px" onclick="speakText(\''+w.s.replace(/'/g,"\\'")+'\',0.9)">🔊 读句子</button></div>';
   });
@@ -379,6 +412,7 @@ function speakAllEn(){
 function renderChores(){
   var cs=pick(CHORES,daySeed(),3);
   var h='<div class="ph"><div class="pt">🧹 家务劳动<span class="sub">我是劳动小能手</span></div></div>';
+  h+='<div class="tip-bar"><b>🧹 劳动指令：</b>认真做完每件小事，记录自己完成的家务。完成后勾选打卡，领取积分。</div>';
   cs.forEach(function(c,i){
     h+='<div class="card"><h3>'+c.t+'</h3><p style="color:var(--text-l)">'+c.d+'</p><div style="margin-top:8px">'+renderCheck('chores'+i,c.t)+'</div></div>';
   });
@@ -391,6 +425,7 @@ function renderPet(){
   var mood=happy>30&&full>30&&clean>30?'happy':'sad';
   var face=happy>30&&full>30&&clean>30?'🐰':'😰';
   var h='<div class="ph"><div class="pt">🐰 小宠物中心<span class="sub">照顾好你的小伙伴</span></div></div>';
+  h+='<div class="tip-bar"><b>🐰 宠物激励：</b>积累饲料可以喂养小宠物，观察宠物状态变化；每日全部打卡完成，宠物获得额外成长值！</div>';
   h+='<div class="card"><div class="pet-a"><div class="pet-c '+mood+'">'+face+'<div class="badge">'+(happy>60?'⭐':'')+'</div></div>';
   h+='<div class="pbars">'+
     '<div class="pbar"><div class="lb"><span>😊 开心值</span><span>'+happy+'/100</span></div><div class="bg"><div class="fl" style="width:'+happy+'%;background:#ffd54f"></div></div></div>'+
@@ -418,6 +453,116 @@ function petAction(act){
   var f=D.get('pet_full',50)-2;if(f<0)f=0;D.set('pet_full',f);
   setTimeout(function(){renderPanel('pet');},100);
 }
+function renderGuide(){
+  var h='<div class="ph"><div class="pt">📋 学习指南<span class="sub">每日学习公约</span></div></div>';
+  h+='<div class="guide-section"><h3><span class="icon">📌</span>一、每日学习通用指令</h3><ul class="guide-list">'+
+    '<li>先整理桌面文具，再开始当日学习任务</li>'+
+    '<li>每个学习模块先看题目，再轻声朗读一遍要求</li>'+
+    '<li>遇到不会的题目先标记，全部做完后再统一查阅</li>'+
+    '<li>完成一个板块后勾选打卡，领取积分与小奖励</li>'+
+    '<li>可以点击语音朗读，跟着发音跟读知识点</li>'+
+    '</ul></div>';
+  h+='<div class="guide-section"><h3><span class="icon">📚</span>二、分板块专项指令</h3><ul class="guide-list">'+
+    '<li><b>语文（拼音/生字/古诗）</b>：生字先观察笔顺，书空3遍，再动笔书写</li>'+
+    '<li>古诗先听朗读，分句理解意思，再背诵默写</li>'+
+    '<li>组词练习每个生字组2个常用词语，口头造句</li>'+
+    '<li><b>数学</b>：计算题先审题，书写竖式，做完自行验算</li>'+
+    '<li>应用题圈画已知条件，分步写出解题思路</li>'+
+    '<li>错题单独标记，当天回看一遍错误原因</li>'+
+    '<li><b>专注力&科普</b>：专注力训练静心完成，不中途切换页面</li>'+
+    '<li>科普内容听完语音后，试着用自己的话复述知识点</li>'+
+    '<li><b>运动&家务</b>：前庭运动跟着动作指引慢速完成，保护脊椎</li>'+
+    '<li>家务任务认真做完，记录自己完成的小事</li>'+
+    '</ul></div>';
+  h+='<div class="guide-section"><h3><span class="icon">🐰</span>宠物打卡激励指令</h3><ul class="guide-list">'+
+    '<li>积累饲料可以喂养小宠物，观察宠物状态变化</li>'+
+    '<li>每日全部打卡完成，宠物可以获得额外成长值</li>'+
+    '</ul></div>';
+  h+='<div class="guide-section"><h3><span class="icon">💖</span>三、行为约束温柔指令</h3><ul class="guide-list">'+
+    '<li>单次学习<b>25分钟</b>，可以休息<b>5分钟</b>远眺放松眼睛</li>'+
+    '<li>不随意刷新题库，先完成当前题目再手动重置</li>'+
+    '<li>打卡记录会自动保存，不用重复勾选任务</li>'+
+    '</ul></div>';
+  h+='<div class="card" style="text-align:center"><p style="color:var(--text-l);font-size:14px">⏱️ 学习计时器已'+(timerRunning?'开启':'关闭')+'<br>当前已学习：<b id="gTimerTxt" style="color:var(--purple);font-size:20px">'+formatTime(timerSec)+'</b></p>';
+  h+='<div style="margin-top:10px;display:flex;gap:8px;justify-content:center">';
+  if(!timerRunning){
+    h+='<button class="btn btn-sm btn-green" onclick="startTimer()">▶️ 开始学习计时</button>';
+  }else{
+    h+='<button class="btn btn-sm btn-pink" onclick="pauseTimer()">⏸️ 暂停计时</button>';
+  }
+  h+='<button class="btn btn-sm" onclick="resetTimer()">🔄 重置</button></div></div>';
+  return h;
+}
+function formatTime(sec){
+  var m=Math.floor(sec/60),s=sec%60;
+  return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+}
+
+// ============ 学习计时器（25分钟学习+5分钟休息） ============
+var timerRunning=false,timerSec=0,timerMode='study',timerInterval=null;
+var STUDY_TIME=25*60,BREAK_TIME=5*60;
+function startTimer(){
+  if(timerRunning)return;
+  timerRunning=true;
+  var bar=document.getElementById('timerBar');
+  if(bar)bar.style.display='block';
+  timerInterval=setInterval(function(){
+    timerSec++;
+    updateTimerDisplay();
+    if(timerMode==='study'&&timerSec>=STUDY_TIME){
+      // 学习时间到，进入休息
+      timerMode='break';
+      timerSec=0;
+      var ov=document.getElementById('breakOverlay');
+      if(ov)ov.style.display='flex';
+      if(bar){bar.className='timer-bar rest';bar.style.width='0%';}
+      try{var u=new SpeechSynthesisUtterance('学习时间到啦！休息5分钟，远眺放松眼睛哦');u.lang='zh-CN';u.rate=0.9;window.speechSynthesis.speak(u);}catch(e){}
+    }else if(timerMode==='break'&&timerSec>=BREAK_TIME){
+      // 休息结束
+      endBreak();
+    }
+  },1000);
+  updateTimerDisplay();
+  toast('学习计时开始！25分钟后提醒休息 ⏱️');
+}
+function pauseTimer(){
+  timerRunning=false;
+  clearInterval(timerInterval);
+  updateTimerDisplay();
+  toast('计时已暂停 ⏸️');
+}
+function resetTimer(){
+  timerRunning=false;
+  clearInterval(timerInterval);
+  timerSec=0;timerMode='study';
+  var bar=document.getElementById('timerBar');
+  if(bar){bar.style.display='none';bar.className='timer-bar';bar.style.width='0%';}
+  updateTimerDisplay();
+  toast('计时已重置 🔄');
+}
+function endBreak(){
+  timerMode='study';timerSec=0;
+  var ov=document.getElementById('breakOverlay');
+  if(ov)ov.style.display='none';
+  var bar=document.getElementById('timerBar');
+  if(bar){bar.className='timer-bar';bar.style.width='0%';}
+  toast('休息完毕，继续加油！💪');
+  try{var u=new SpeechSynthesisUtterance('休息完毕，继续加油');u.lang='zh-CN';u.rate=0.9;window.speechSynthesis.speak(u);}catch(e){}
+}
+function updateTimerDisplay(){
+  var disp=document.getElementById('timerDisp');
+  var bar=document.getElementById('timerBar');
+  if(disp){
+    var prefix=timerMode==='study'?'📖':'🌿';
+    disp.textContent=timerRunning?(prefix+' '+formatTime(timerSec)):'';
+  }
+  if(bar&&timerRunning){
+    var total=timerMode==='study'?STUDY_TIME:BREAK_TIME;
+    var pct=Math.min(100,(timerSec/total)*100);
+    bar.style.width=pct+'%';
+  }
+}
+
 function renderCalendar(){
   var now=new Date();
   var y=now.getFullYear(),m=now.getMonth();
@@ -463,7 +608,7 @@ function updateCalMarks(){if(document.getElementById('p-calendar').classList.con
 // ============ 主渲染 ============
 function renderPanel(name){
   var main=document.getElementById('main');
-  var fns={reading:renderReading,words:renderWords,poems:renderPoems,math:renderMath,science:renderScience,english:renderEnglish,chores:renderChores,pet:renderPet,calendar:renderCalendar};
+  var fns={reading:renderReading,words:renderWords,poems:renderPoems,math:renderMath,science:renderScience,english:renderEnglish,chores:renderChores,pet:renderPet,calendar:renderCalendar,guide:renderGuide};
   var html=fns[name]();
   main.innerHTML=html;
   // 同步导航高亮（避免递归 sw）
@@ -494,6 +639,31 @@ function init(){
   }
   updateNav();
   renderPanel('reading');
+  // 首次打开弹出学习公约
+  if(!D.get('guideSeen',false)){
+    setTimeout(function(){
+      D.set('guideSeen',true);
+      showGuidePopup();
+    },800);
+  }
+}
+function showGuidePopup(){
+  var overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+  overlay.innerHTML='<div style="background:#fff;border-radius:20px;padding:24px;max-width:380px;max-height:80vh;overflow-y:auto">'+
+    '<div style="text-align:center;font-size:40px;margin-bottom:8px">🐰📋</div>'+
+    '<h3 style="color:#ec407a;text-align:center;font-size:20px;margin-bottom:12px">Minnie每日学习公约</h3>'+
+    '<div style="font-size:14px;line-height:1.8;color:#4a3b45">'+
+    '<p style="margin-bottom:8px"><b style="color:#ec407a">📌 通用指令：</b></p>'+
+    '<p style="margin-bottom:8px">① 先整理桌面文具，再开始学习<br>② 先看题目，轻声朗读一遍要求<br>③ 遇到不会的先标记，做完再查阅<br>④ 完成板块后勾选打卡，领取积分<br>⑤ 点击语音朗读，跟读知识点</p>'+
+    '<p style="margin-bottom:8px"><b style="color:#ec407a">💖 行为约束：</b></p>'+
+    '<p style="margin-bottom:8px">• 单次学习25分钟，休息5分钟远眺<br>• 不随意刷新题库，先完成再重置<br>• 打卡记录自动保存</p>'+
+    '<p style="margin-bottom:8px"><b style="color:#ec407a">🐰 宠物激励：</b></p>'+
+    '<p>积累饲料喂养小宠物，全部打卡获额外成长值</p>'+
+    '</div>'+
+    '<button onclick="this.parentElement.parentElement.remove()" style="display:block;width:100%;margin-top:16px;background:#f48fb1;color:#fff;border:none;padding:14px;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;font-family:inherit">我知道啦，开始学习！💪</button>'+
+    '</div>';
+  document.body.appendChild(overlay);
 }
 // 覆盖pick：支持手动刷新种子
 var _origPick=pick;
